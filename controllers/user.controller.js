@@ -1,7 +1,7 @@
 import userDB from "../models/Users.model.js";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken';
-
+import blogDB from "../models/blog.model.js"
 
 export const userRegister = async(req, res)=>{
     // taking user register form data from the user
@@ -75,10 +75,95 @@ export const userLogin = async(req, res)=>{
         maxAge : 7 * 24 * 60 * 60 * 1000
     })
 
-    return  res.status(201).json({message:"User Login Successfully!", success:true})
+    return  res.status(201).json({message:"User Login Successfully!", token,success:true})
 
     
 }
+
+
+// create
+export const addBlog = async(req, res)=>{
+    try {
+
+    const {title, description} = req.body
+    if(!title || !description){
+        return res.json({message:"Please Enter required Fields", success: false})
+    }
+
+    const created = await blogDB.create({userId:req.userId, title, description})
+
+    // console.log(created)
+    return res.json({message: 'new blog uploaded', success:true})
+        
+    } catch (error) {
+        console.log(error)
+        return res.json({message: error.message, success:false})
+        
+    }
+    
+    
+}
+
+// delete
+export const deleteBlog = async(req, res)=>{
+    try {
+    const blogId = req.params.blogId
+    if(!blogId){
+        return res.json({message:"Unathorized operation", success: false})
+    }
+
+    await blogDB.findByIdAndDelete(blogId)
+
+    return res.json({message: 'blog deleted', success:true})
+        
+    } catch (error) {
+        console.log(error)
+        return res.json({message: error.message, success:false})
+        
+    }
+    
+    
+}
+
+// update
+export const updateBlog = async(req, res)=>{
+    try {
+
+    const {blogId, title, description} = req.body
+    if(!blogId){
+        return res.json({message:"Please update correct blog", success: false})
+    }
+
+    const updated = await blogDB.findByIdAndUpdate(blogId,{title, description})
+
+    
+    return res.json({message: 'blog updated', success:true})
+        
+    } catch (error) {
+        console.log(error)
+        return res.json({message: error.message, success:false})
+        
+    }
+    
+    
+} 
+
+// featch all blog
+export const featchAllBlog = async(req, res)=>{
+    try {
+    const userId = req.userId
+    const blogData = await blogDB.find({userId})
+    return res.json({message: 'fetch successfully', blogData,success:true})
+        
+    } catch (error) {
+        console.log(error)
+        return res.json({message: error.message, success:false})
+        
+    }
+    
+    
+}
+
 
 
 
