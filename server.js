@@ -1,6 +1,6 @@
 import express from 'express'
 import dbConnect from './config/db.js'
-import {userRegister} from './controllers/user.controller.js'
+import {userRegister,userLogin} from './controllers/user.controller.js'
 import dotenv from 'dotenv';
 dotenv.config({path:'./config/.env'});
 
@@ -16,10 +16,10 @@ app.use(express.urlencoded({extended:true}))
 app.get('/', (req, res)=>{
     return res.json('Hello')
 })
+
+// user
 app.post('/auth/user/register',userRegister)
-
-
-
+app.post('/auth/user/login',userLogin)
 
 
 
