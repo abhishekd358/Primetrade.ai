@@ -1,5 +1,4 @@
-import jwt from 'jsonwebtoken';
-import crypto from 'crypto'
+import blogDB from '../models/blog.model.js';
 
 export const adminLogin = async(req, res)=>{
     const {email, password} = req.body 
@@ -18,19 +17,7 @@ export const adminLogin = async(req, res)=>{
         
     }
 
-    const adminId = crypto.randomUUID()
-    // create a token 
-    const token = jwt.sign({id: adminId},process.env.SECRECT_JWT, {expiresIn: '7d'})
-
-    // before return hum send kar denfge cookies
-    res.cookie('token', token,{
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge : 7 * 24 * 60 * 60 * 1000
-    })
-
-    return  res.status(201).json({message:"User Login Successfully!", token,success:true})
+    return  res.status(201).json({message:"Admin Login Successfully!",success:true})
 
     
 }
@@ -40,8 +27,33 @@ export const adminLogin = async(req, res)=>{
 // featch all blog
 export const allBlogs = async(req, res)=>{
     try {
-    const blogData = await blogDB.find()
+    const blogData = await blogDB.find().populate("userId", "name email");
+    
+    // console.log(blogData)
     return res.json({message: 'fetch successfully', blogData,success:true})
+    } catch (error) {
+        console.log(error)
+        return res.json({message: error.message, success:false})
+        
+    }
+    
+    
+}
+
+
+
+// delete blog
+
+export const adminDeleteBlogs = async(req, res)=>{
+    try {
+    const blogId = req.params.blogId
+    if(!blogId){
+        return res.json({message:"Unathorized operation", success: false})
+    }
+
+    await blogDB.findByIdAndDelete(blogId)
+
+    return res.json({message: 'blog deleted', success:true})
         
     } catch (error) {
         console.log(error)

@@ -4,11 +4,22 @@ import {userRegister,userLogin, addBlog, deleteBlog, updateBlog, featchAllBlog} 
 import dotenv from 'dotenv';
 import { UserAuth } from './auth/user.auth.js';
 dotenv.config({path:'./config/.env'});
+import cors from "cors"
+import cookieParser from "cookie-parser";
+import { adminDeleteBlogs, adminLogin, allBlogs } from './controllers/admin.controller.js';
+
+
 
 const app = express()
 dbConnect()
 
 
+
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
+app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
@@ -27,6 +38,12 @@ app.post('/blog', UserAuth, addBlog)
 app.delete('/blog/:blogId', UserAuth, deleteBlog)
 app.put('/blog', UserAuth, updateBlog)
 app.get('/blog', UserAuth,featchAllBlog)
+
+
+// admin login
+app.post('/admin-login', adminLogin)
+app.get('/admin-dashboard', allBlogs)
+app.delete('/admin-dashboard/:blogId', adminDeleteBlogs)
 
 
 

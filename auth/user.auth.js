@@ -4,8 +4,8 @@ import userDB from "../models/Users.model.js";
 
 export const UserAuth = async (req, res, next) => {
     try{
-        const token = req.header('Auth')
-    console.log(token)
+        const token = req.cookies.token;
+//     console.log(token)
 
     if(!token){
         return res.json({message:'Login First', success: false})
