@@ -1,11 +1,12 @@
 import express from "express"
+import { adminDeleteBlogs, adminLogin, allBlogs } from '../controllers/admin.controller.js'
 
 const adminRouter = express.Router()
 
 
-app.post('/login', adminLogin)
-app.get('/dashboard', allBlogs)
-app.delete('/dashboard/:blogId', adminDeleteBlogs)
+adminRouter.post('/login', adminLogin)
+adminRouter.get('/dashboard', allBlogs)
+adminRouter.delete('/dashboard/:blogId', adminDeleteBlogs)
 
 
 

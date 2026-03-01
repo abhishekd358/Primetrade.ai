@@ -1,12 +1,9 @@
 import express from 'express'
 import dbConnect from './config/db.js'
-import {userRegister,userLogin, addBlog, deleteBlog, updateBlog, featchAllBlog} from './controllers/user.controller.js'
 import dotenv from 'dotenv';
-import { UserAuth } from './auth/user.auth.js';
 dotenv.config({path:'./config/.env'});
 import cors from "cors"
 import cookieParser from "cookie-parser";
-import { adminDeleteBlogs, adminLogin, allBlogs } from './controllers/admin.controller.js';
 import userRouter from './routes/user.routes.js';
 import blogRouter from './routes/blog.routes.js';
 import adminRouter from './routes/admin.routes.js';
@@ -26,11 +23,6 @@ app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
-
-
-app.get('/', (req, res)=>{
-    return res.json('Hello')
-})
 
 // user
 app.use('/api',userRouter)
