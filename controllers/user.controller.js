@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import blogDB from "../models/blog.model.js"
 import { userLoginSchema, userRegisterSchema } from '../validators/user.validator.js'
 import { addblogSchemaValidator, updateblogSchemaValidator } from "../validators/blog.validator.js";
+import { sanitize } from "../utils/sanitize.js";
 
 export const userRegister = async(req, res)=>{
     // zod=====>
@@ -18,6 +19,11 @@ export const userRegister = async(req, res)=>{
     
     // taking user register form data from the user
     const {name, email, password} = result.data
+
+    // sanitize
+    name = sanitize(name)
+    email= sanitize(email)
+    password= sanitize(password)
 
     // now before creating check user in db
     const alreadyUser = await userDB.findOne({email})
@@ -61,6 +67,10 @@ export const userLogin = async(req, res)=>{
     }
 
     const {email, password} = result.data
+
+    // sanitize
+    email= sanitize(email)
+    password= sanitize(password)
 
 
     // now check is user present hai kaya db mai
@@ -109,6 +119,10 @@ export const addBlog = async(req, res)=>{
 
     const {title, description} = result.data
 
+    // saniti
+    title = sanitize(title)
+    description= sanitize(description)
+
     const created = await blogDB.create({userId:req.userId, title, description})
 
     // console.log(created)
@@ -155,6 +169,11 @@ export const updateBlog = async(req, res)=>{
     }
 
     const {blogId, title, description} = req.body
+
+    blogId= sanitize(blogId)
+    title= sanitize(title)
+    description = sanitize(description)
+
     // if(!blogId){
     //     return res.json({message:"Please update correct blog", success: false})
     // }
