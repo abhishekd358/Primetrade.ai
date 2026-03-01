@@ -1,9 +1,8 @@
 import userDB from "../models/Users.model.js";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken';
-import blogDB from "../models/blog.model.js"
+
 import { userLoginSchema, userRegisterSchema } from '../validators/user.validator.js'
-import { addblogSchemaValidator, updateblogSchemaValidator } from "../validators/blog.validator.js";
 import { sanitize } from "../utils/sanitize.js";
 
 export const userRegister = async(req, res)=>{
@@ -21,9 +20,9 @@ export const userRegister = async(req, res)=>{
     const {name, email, password} = result.data
 
     // sanitize
-    name = sanitize(name)
-    email= sanitize(email)
-    password= sanitize(password)
+    const cleanName = sanitize(name)
+    const cleanEmail= sanitize(email)
+    const cleanPassword= sanitize(password)
 
     // now before creating check user in db
     const alreadyUser = await userDB.findOne({email})
@@ -33,9 +32,9 @@ export const userRegister = async(req, res)=>{
     }
 
     // mow we have to hash the passwordr 
-    const hashPassword = await bcrypt.hash(password, 10)
+    const hashPassword = await bcrypt.hash(cleanPassword, 10)
 
-    const userSaved= await userDB.create({name, email,password:hashPassword})
+    const userSaved= await userDB.create({name:cleanName, email:cleanEmail,password:hashPassword})
 
     // create a token 
     const token = jwt.sign({id: userSaved._id},process.env.SECRECT_JWT, {expiresIn: '7d'})
@@ -69,19 +68,19 @@ export const userLogin = async(req, res)=>{
     const {email, password} = result.data
 
     // sanitize
-    email= sanitize(email)
-    password= sanitize(password)
+    const cleanEmail= sanitize(email)
+    const cleanPassword= sanitize(password)
 
-
+    
     // now check is user present hai kaya db mai
-    const userData = await userDB.findOne({email})
+    const userData = await userDB.findOne({email: cleanEmail })
     
     if(!userData){
         return res.json({message:"User Not exists", success:false})
     }
 
     //  verify password
-    const  verifyPassword= await bcrypt.compare(password, userData.password)
+    const  verifyPassword= await bcrypt.compare(cleanPassword, userData.password)
 
     if(!verifyPassword){
         return res.json({message:"Please enter valid password", success: false})
@@ -104,109 +103,7 @@ export const userLogin = async(req, res)=>{
 }
 
 
-// create
-export const addBlog = async(req, res)=>{
-    try {
 
-        const result = addblogSchemaValidator.safeParse(req.body)
-        if(!result.success){
-        return res.json({
-            success: false,
-            message: result.error.issues[0].message
-        });
-    }
-
-
-    const {title, description} = result.data
-
-    // saniti
-    title = sanitize(title)
-    description= sanitize(description)
-
-    const created = await blogDB.create({userId:req.userId, title, description})
-
-    // console.log(created)
-    return res.json({message: 'new blog uploaded', success:true})
-        
-    } catch (error) {
-        console.log(error)
-        return res.json({message: error.message, success:false})
-        
-    }
-    
-    
-}
-
-// delete
-export const deleteBlog = async(req, res)=>{
-    try {
-    const blogId = req.params.blogId
-    if(!blogId){
-        return res.json({message:"Unathorized operation", success: false})
-    }
-
-    await blogDB.findByIdAndDelete(blogId)
-
-    return res.json({message: 'blog deleted', success:true})
-        
-    } catch (error) {
-        console.log(error)
-        return res.json({message: error.message, success:false})
-        
-    }
-    
-}
-
-// update
-export const updateBlog = async(req, res)=>{
-    try {
-        const result = updateblogSchemaValidator.safeParse(req.body)
-        if(!result.success){
-        return res.json({
-            success: false,
-            message: result.error.issues[0].message
-        });
-    }
-
-    const {blogId, title, description} = req.body
-
-    blogId= sanitize(blogId)
-    title= sanitize(title)
-    description = sanitize(description)
-
-    // if(!blogId){
-    //     return res.json({message:"Please update correct blog", success: false})
-    // }
-
-    await blogDB.findByIdAndUpdate(blogId,{title, description})
-
-    
-    return res.json({message: 'blog updated', success:true})
-        
-    } catch (error) {
-        console.log(error)
-        return res.json({message: error.message, success:false})
-        
-    }
-    
-    
-} 
-
-// featch all blog
-export const featchAllBlog = async(req, res)=>{
-    try {
-    const userId = req.userId
-    const blogData = await blogDB.find({userId})
-    return res.json({message: 'fetch successfully', blogData,success:true})
-        
-    } catch (error) {
-        console.log(error)
-        return res.json({message: error.message, success:false})
-        
-    }
-    
-    
-}
 
 
 
