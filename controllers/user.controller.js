@@ -25,7 +25,7 @@ export const userRegister = async(req, res)=>{
     const cleanPassword= sanitize(password)
 
     // now before creating check user in db
-    const alreadyUser = await userDB.findOne({email})
+    const alreadyUser = await userDB.findOne({email:cleanEmail})
     
     if(alreadyUser){
         return res.json({message:"User already exists!. Please login.", success:false})

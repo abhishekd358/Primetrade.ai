@@ -14,7 +14,7 @@ const app = express()
 dbConnect()
 
 
-
+app.set("trust proxy", 1);
 app.use(cors({
   origin: ["http://localhost:5173", "https://primetrade-frontend-theta.vercel.app"],
   credentials: true
