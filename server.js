@@ -7,6 +7,9 @@ dotenv.config({path:'./config/.env'});
 import cors from "cors"
 import cookieParser from "cookie-parser";
 import { adminDeleteBlogs, adminLogin, allBlogs } from './controllers/admin.controller.js';
+import userRouter from './routes/user.routes.js';
+import blogRouter from './routes/blog.routes.js';
+import adminRouter from './routes/admin.routes.js';
 
 
 
@@ -30,20 +33,16 @@ app.get('/', (req, res)=>{
 })
 
 // user
-app.post('/auth/user/register',userRegister)
-app.post('/auth/user/login',userLogin)
+app.use('/api',userRouter)
 
 // blog
-app.post('/blog', UserAuth, addBlog)
-app.delete('/blog/:blogId', UserAuth, deleteBlog)
-app.put('/blog', UserAuth, updateBlog)
-app.get('/blog', UserAuth,featchAllBlog)
+app.use('/api/user/blog', blogRouter )
+
+// admin routes
 
 
 // admin login
-app.post('/admin-login', adminLogin)
-app.get('/admin-dashboard', allBlogs)
-app.delete('/admin-dashboard/:blogId', adminDeleteBlogs)
+app.use('/api/admin', adminRouter)
 
 
 
