@@ -2,15 +2,22 @@ import userDB from "../models/Users.model.js";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken';
 import blogDB from "../models/blog.model.js"
+import { userLoginSchema, userRegisterSchema } from '../validators/user.validator.js'
+import { addblogSchemaValidator, updateblogSchemaValidator } from "../validators/blog.validator.js";
 
 export const userRegister = async(req, res)=>{
-    // taking user register form data from the user
-    const {name, email, password} = req.body
-
-    // checking the fields are present in body or not 
-    if(!name || !email || !password){
-        return res.json({message:"Please Enter required Fields", success: false})
+    // zod=====>
+    const result = userRegisterSchema.safeParse(req.body)
+        if(!result.success){
+        return res.json({
+            success: false,
+            message: result.error.issues[0].message
+        });
     }
+
+    
+    // taking user register form data from the user
+    const {name, email, password} = result.data
 
     // now before creating check user in db
     const alreadyUser = await userDB.findOne({email})
@@ -43,12 +50,18 @@ export const userRegister = async(req, res)=>{
 
 
 export const userLogin = async(req, res)=>{
-    const {email, password} = req.body 
 
-    // checking the fields are present in body or not 
-    if(!email || !password){
-        return res.json({message:"Please Enter required Fields", success: false})
+    // zod=====>
+    const result = userLoginSchema.safeParse(req.body)
+        if(!result.success){
+        return res.json({
+            success: false,
+            message: result.error.issues[0].message
+        });
     }
+
+    const {email, password} = result.data
+
 
     // now check is user present hai kaya db mai
     const userData = await userDB.findOne({email})
@@ -85,10 +98,16 @@ export const userLogin = async(req, res)=>{
 export const addBlog = async(req, res)=>{
     try {
 
-    const {title, description} = req.body
-    if(!title || !description){
-        return res.json({message:"Please Enter required Fields", success: false})
+        const result = addblogSchemaValidator.safeParse(req.body)
+        if(!result.success){
+        return res.json({
+            success: false,
+            message: result.error.issues[0].message
+        });
     }
+
+
+    const {title, description} = result.data
 
     const created = await blogDB.create({userId:req.userId, title, description})
 
@@ -127,13 +146,20 @@ export const deleteBlog = async(req, res)=>{
 // update
 export const updateBlog = async(req, res)=>{
     try {
-
-    const {blogId, title, description} = req.body
-    if(!blogId){
-        return res.json({message:"Please update correct blog", success: false})
+        const result = updateblogSchemaValidator.safeParse(req.body)
+        if(!result.success){
+        return res.json({
+            success: false,
+            message: result.error.issues[0].message
+        });
     }
 
-    const updated = await blogDB.findByIdAndUpdate(blogId,{title, description})
+    const {blogId, title, description} = req.body
+    // if(!blogId){
+    //     return res.json({message:"Please update correct blog", success: false})
+    // }
+
+    await blogDB.findByIdAndUpdate(blogId,{title, description})
 
     
     return res.json({message: 'blog updated', success:true})
