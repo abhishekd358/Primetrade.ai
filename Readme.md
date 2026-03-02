@@ -1,4 +1,4 @@
-# PrimeTrade AI — Blog API
+# PrimeTrade AI — Blog API <a href="https://primetrade-frontend-theta.vercel.app/">Live Link</a>
 
 ### Postman Collection: 
 - Access postman collection from ->
