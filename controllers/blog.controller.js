@@ -94,7 +94,7 @@ export const updateBlog = async(req, res)=>{
 export const featchAllBlog = async(req, res)=>{
     try {
     const userId = req.userId
-    const blogData = await blogDB.find({userId})
+    const blogData = await blogDB.find({userId}).select("-userId")
     return res.json({message: 'fetch successfully', blogData,success:true})
         
     } catch (error) {

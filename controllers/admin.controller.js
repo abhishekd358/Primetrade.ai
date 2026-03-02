@@ -27,7 +27,7 @@ export const adminLogin = async(req, res)=>{
 // featch all blog
 export const allBlogs = async(req, res)=>{
     try {
-    const blogData = await blogDB.find().populate("userId", "name email");
+    const blogData = await blogDB.find().populate("userId", "name email -_id");
     
     // console.log(blogData)
     return res.json({message: 'fetch successfully', blogData,success:true})
