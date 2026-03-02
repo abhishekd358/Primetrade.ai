@@ -7,6 +7,14 @@ export const UserAuth = async (req, res, next) => {
         const token = req.cookies.token;
 //     console.log(token)
 
+     // if not token then we fetch from header
+         if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+      }
+    }
+
     if(!token){
         return res.json({message:'Login First', success: false})
     }

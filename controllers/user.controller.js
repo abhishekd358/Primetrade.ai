@@ -39,15 +39,16 @@ export const userRegister = async(req, res)=>{
     // create a token 
     const token = jwt.sign({id: userSaved._id},process.env.SECRECT_JWT, {expiresIn: '7d'})
 
+    const isProduction = process.env.NODE_ENV === "production";
     // before return hum send kar denfge cookies
     res.cookie('token', token,{
         httpOnly: true,
-        secure: true,
-        sameSite: 'none',
+        secure: isProduction,                
+        sameSite: isProduction ? "none" : "lax",
         maxAge : 7 * 24 * 60 * 60 * 1000
     })
 
-    return  res.status(201).json({message:"User Registerd Successfully!", success:true})
+    return  res.status(201).json({message:"User Registerd Successfully!",token, success:true})
 
 }
 
@@ -89,11 +90,12 @@ export const userLogin = async(req, res)=>{
     // create a token 
     const token = jwt.sign({id: userData._id},process.env.SECRECT_JWT, {expiresIn: '7d'})
 
+    const isProduction = process.env.NODE_ENV === "production";
     // before return hum send kar denfge cookies
     res.cookie('token', token,{
         httpOnly: true,
-        secure: true,
-        sameSite: 'none',
+        secure:  isProduction,
+        sameSite: isProduction ? "none" : "lax",
         maxAge : 7 * 24 * 60 * 60 * 1000
     })
 
